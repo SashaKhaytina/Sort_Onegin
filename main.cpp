@@ -17,7 +17,7 @@ void swap_str(char* str1, char* str2);    // переставление стро
 void read_file(FILE **file, char* text);  // запись в двумерный массив
 int str_len(char* str1);  // Длина без '\0'
 
-void go_to_next_letter(char* str1, int* ind_now);
+void go_to_next_letter(char* str1, int* ind_now, int* el);
 
 
 int main()
@@ -112,28 +112,35 @@ int compare_str(char* str1, char* str2)  // Вернет > 0 при str1 > str2,
 
     while ((str1[ind_elem_1] != '\0') && (str2[ind_elem_2] != '\0'))
     {
-        // printf("%c%c, ", str1[ind_elem], str2[ind_elem]);
+        //printf("\n\n\n%s%s, \n", str1, str2);
+        //printf("%c%c, \n", str1[ind_elem_1], str2[ind_elem_2]);
 
         int el1 = tolower(str1[ind_elem_1]);
         int el2 = tolower(str2[ind_elem_2]);
 
-        //Смещение счетчика до буквы в str1
-        while ((!islower(el1)) && (el1 != '\0'))
-        {
-            ind_elem_1++;
-            el1 = tolower(str1[ind_elem_1]);
-        }
+        // Смещение счетчика до буквы в str1
+        // while ((!islower(el1)) && (el1 != '\0'))
+        // {
+        //     ind_elem_1++;
+        //     el1 = tolower(str1[ind_elem_1]);
+        // }
 
-        //go_to_next_letter(str1, &ind_elem_1);
+        //printf("%d, %d 111111111\n", ind_elem_1, ind_elem_2);
 
-        //Смещение счетчика до буквы в str2
-        while ((!islower(el2)) && (el2 != '\0'))
-        {
-            ind_elem_2++;
-            el2 = tolower(str2[ind_elem_2]);
-        }
+        go_to_next_letter(str1, &ind_elem_1, &el1);
 
-        //go_to_next_letter(str2, &ind_elem_2);
+        // Смещение счетчика до буквы в str2
+        // while ((!islower(el2)) && (el2 != '\0'))
+        // {
+        //     ind_elem_2++;
+        //     el2 = tolower(str2[ind_elem_2]);
+        // }
+
+        go_to_next_letter(str2, &ind_elem_2, &el2);
+
+        //printf("%d, %d 222222222\n", ind_elem_1, ind_elem_2);
+
+        //printf("%c%c, ", str1[ind_elem_1], str2[ind_elem_2]);
 
 
         int comp = el1 - el2;
@@ -178,13 +185,19 @@ void swap_str(char* str1, char* str2)
 }
 
 
-void go_to_next_letter(char* str1, int* ind_now)
+void go_to_next_letter(char* str1, int* ind_now, int* el)
 {
-    int el1 = tolower(str1[*ind_now]);
-
-    while ((!islower(el1)) && (el1 != '\0'))
+    //printf("go to next letter start\n\n");
+    //int el1 = tolower(str1[*ind_now]);
+    while (((islower(*el) == 0) && (*el != '\0')))
     {
-        *ind_now++;
-        el1 = tolower(str1[*ind_now]);
+
+        (*ind_now)++;
+        //printf("%c %s\n", *el, str1);
+        *el = tolower(str1[*ind_now]);
+
+        //if(*el == 'e')  printf("%d, %d", (islower(*el) == 0), (*el != '\0'));
     }
+    //printf("%c , %d %s\n", *el, *el, str1);
+    //printf("go to next letter finish\n\n");
 }
