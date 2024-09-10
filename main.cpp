@@ -8,17 +8,14 @@
 int const WIDTH = 100;
 int const HEIGHT = 8;
 
-void sort_str(char* text); // запуск сортировки (пузырек)
+void sort_str(char* text);                      // запуск сортировки (пузырек)
+void swap_str(char* str1, char* str2);          // переставление строк местами
+void read_file(FILE **file, char* text);        // запись в двумерный массив
+int str_len(char* str1);                        // Длина без '\0'
+int go_to_next_letter(char* str1, int ind_now); // Возвращает индекс близжайшей буквы
 
-int compare_str(char* str1, char* str2); // сравнение строк
-// Вернет > 0 при str1 > str2, < 0 при str1 < str2, = 0 при str1 = str2
-
-void swap_str(char* str1, char* str2);    // переставление строк местами
-void read_file(FILE **file, char* text);  // запись в двумерный массив
-int str_len(char* str1);  // Длина без '\0'
-
-void go_to_next_letter(char* str1, int* ind_now, int* el);
-
+int compare_str(char* str1, char* str2);        // сравнение строк
+                                                // Вернет > 0 при str1 > str2, < 0 при str1 < str2, = 0 при str1 = str2
 
 int main()
 {
@@ -88,60 +85,17 @@ void sort_str(char* text)
 
 int compare_str(char* str1, char* str2)  // Вернет > 0 при str1 > str2, < 0 при str1 < str2, = 0 при str1 = str2
 {
-
-//     Без пропуска небуквенных символов
-//     int ind_elem = 0;
-//
-//     while ((str1[ind_elem] != '\0') && (str2[ind_elem] != '\0'))
-//     {
-//         // printf("%c%c, ", str1[ind_elem], str2[ind_elem]);
-//
-//         int el1 = tolower(str1[ind_elem]);
-//         int el2 = tolower(str2[ind_elem]);
-//
-//         int comp = el1 - el2;
-//         if (comp != 0)  return comp;
-//         else            ind_elem++;
-//     }
-//
-//     return (str1[ind_elem] - str2[ind_elem]);  // Тут кто-то '\0', поэтому без tolower()
-
-
     int ind_elem_1 = 0;
     int ind_elem_2 = 0;
 
     while ((str1[ind_elem_1] != '\0') && (str2[ind_elem_2] != '\0'))
     {
-        //printf("\n\n\n%s%s, \n", str1, str2);
-        //printf("%c%c, \n", str1[ind_elem_1], str2[ind_elem_2]);
+        // Смещение счетчика до буквы в str1 и str2
+        ind_elem_1 = go_to_next_letter(str1, ind_elem_1);
+        ind_elem_2 = go_to_next_letter(str2, ind_elem_2);
 
         int el1 = tolower(str1[ind_elem_1]);
         int el2 = tolower(str2[ind_elem_2]);
-
-        // Смещение счетчика до буквы в str1
-        // while ((!islower(el1)) && (el1 != '\0'))
-        // {
-        //     ind_elem_1++;
-        //     el1 = tolower(str1[ind_elem_1]);
-        // }
-
-        //printf("%d, %d 111111111\n", ind_elem_1, ind_elem_2);
-
-        go_to_next_letter(str1, &ind_elem_1, &el1);
-
-        // Смещение счетчика до буквы в str2
-        // while ((!islower(el2)) && (el2 != '\0'))
-        // {
-        //     ind_elem_2++;
-        //     el2 = tolower(str2[ind_elem_2]);
-        // }
-
-        go_to_next_letter(str2, &ind_elem_2, &el2);
-
-        //printf("%d, %d 222222222\n", ind_elem_1, ind_elem_2);
-
-        //printf("%c%c, ", str1[ind_elem_1], str2[ind_elem_2]);
-
 
         int comp = el1 - el2;
         if (comp != 0)
@@ -185,19 +139,13 @@ void swap_str(char* str1, char* str2)
 }
 
 
-void go_to_next_letter(char* str1, int* ind_now, int* el)
+int go_to_next_letter(char* str1, int ind_now) // Возвращает индекс близжайшей буквы
 {
-    //printf("go to next letter start\n\n");
-    //int el1 = tolower(str1[*ind_now]);
-    while (((islower(*el) == 0) && (*el != '\0')))
+    int el = tolower(str1[ind_now]);
+    while (((islower(el) == 0) && (el != '\0')))
     {
-
-        (*ind_now)++;
-        //printf("%c %s\n", *el, str1);
-        *el = tolower(str1[*ind_now]);
-
-        //if(*el == 'e')  printf("%d, %d", (islower(*el) == 0), (*el != '\0'));
+        (ind_now)++;
+        el = tolower(str1[ind_now]);
     }
-    //printf("%c , %d %s\n", *el, *el, str1);
-    //printf("go to next letter finish\n\n");
+    return ind_now;
 }
