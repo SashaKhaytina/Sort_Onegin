@@ -5,6 +5,9 @@
 #define MAX(a, b) \
     a > b ? a : b
 
+// Массив "индексов" строк
+// Массив указателей на строки
+
 int const WIDTH = 100;
 int const HEIGHT = 8;
 
@@ -47,6 +50,7 @@ int main()
 int str_len (char* str1)
 {
     int ind_elem = 0;
+
     while (str1[ind_elem] != '\0') ind_elem++;
     return ind_elem;
 }
@@ -130,7 +134,7 @@ void swap_str(char* str1, char* str2)
 
     while (ind_elem < (MAX(len_str1, len_str2)))
     {
-        symbol = str1[ind_elem];
+        symbol         = str1[ind_elem];
         str1[ind_elem] = str2[ind_elem];
         str2[ind_elem] = symbol;
 
@@ -142,10 +146,12 @@ void swap_str(char* str1, char* str2)
 int go_to_next_letter(char* str1, int ind_now) // Возвращает индекс близжайшей буквы
 {
     int el = tolower(str1[ind_now]);
+
     while (((islower(el) == 0) && (el != '\0')))
     {
         (ind_now)++;
         el = tolower(str1[ind_now]);
     }
+
     return ind_now;
 }
