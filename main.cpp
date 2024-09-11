@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <ctype.h>
+#include <malloc.h>
 
 
 #define MAX(a, b) \
@@ -11,9 +12,20 @@
 int const WIDTH = 100;
 int const HEIGHT = 8;
 
-void sort_str(char* text);                      // запуск сортировки (пузырек)
-void swap_str(char* str1, char* str2);          // переставление строк местами
-void read_file(FILE **file, char* text);        // запись в двумерный массив
+struct Onegin
+{
+    char** ind_arr;  // массив указателей
+    char* text;
+    int len_text;
+    int len_strings;
+};
+
+
+void print_given_text(Onegin* Box);             // НАЧАЛЬНЫЙ!!!!
+void print_sorted_text(Onegin* Box);            // Сортированный
+void sort_str(Onegin* Box);                     // запуск сортировки (пузырек)
+void swap_str(Onegin* Box, int ind1, int ind2); // переставление строк местами
+void read_file(char* file_name, Onegin* Box);   // запись в двумерный массив
 int str_len(char* str1);                        // Длина без '\0'
 int go_to_next_letter(char* str1, int ind_now); // Возвращает индекс близжайшей буквы
 
@@ -22,27 +34,51 @@ int compare_str(char* str1, char* str2);        // сравнение строк
 
 int main()
 {
-    char text[HEIGHT][WIDTH] = {};
-
     // чтение файла
 
-    FILE* file = NULL;
-    file = fopen("text.txt", "r");
-    if ((file) == NULL) printf("Не получилось открыть");
+    Onegin Box = {};
 
-    read_file(&file, text[0]);
+    read_file("text.txt", &Box);
 
-    for (int i = 0; i < HEIGHT; i++)
-    {
-        puts(text[i]); // выводит, заменяя "\0" на "\n"
-    }
+    printf("\n");
 
-    sort_str(*text);
+    printf("%d - колво строк\n", Box.len_strings);
+    printf("%d - колво символов\n", Box.len_text);
+
+    printf("\n");
+
+    printf("%s\n", Box.text);
+
+    printf("\n");
+
+    printf("%s\n\n", (Box.ind_arr)[7]);
+
+    print_given_text(&Box);
+
     printf("\n\n\n");
+    sort_str(&Box);
+    print_sorted_text(&Box);
+}
 
-    for (int i = 0; i < HEIGHT; i++)
+
+void print_given_text(Onegin* Box)
+{
+    char* point = NULL;
+    point = Box->text;
+    for (int i = 0; i < Box->len_text; i++)
     {
-        puts(text[i]); // выводит, заменяя "\0" на "\n"
+        char c = *point;
+        if (c == '\0') printf("\n");
+        else printf("%c", c);
+        point++;
+    }
+}
+
+void print_sorted_text(Onegin* Box)
+{
+    for (int i = 0; i < (Box->len_strings); i++)
+    {
+        printf("%s\n", (Box->ind_arr)[i]);
     }
 }
 
@@ -56,28 +92,65 @@ int str_len (char* str1)
 }
 
 
-void read_file(FILE **file, char* text) // char** указатель на начало строки
+void read_file(char* file_name, Onegin* Box)
 {
-    for (int i = 0; i < HEIGHT; i++)
+    FILE* file = NULL;
+    file = fopen(file_name, "r");
+    if ((file) == NULL) printf("Не получилось открыть");
+
+    // Шаманство с курсором -> <-
+    if (fseek(file, 0, SEEK_END) != 0) printf("Курсор не подвинулся\n");
+    (Box->len_text) = ftell(file);
+    if (fseek(file, 0, SEEK_SET) != 0) printf("Курсор не вернулся\n");
+
+    (Box->text) = (char*) calloc((Box->len_text) + 1, sizeof(char));
+
+
+    for (int i = 0; i < (Box->len_text); i++)
     {
-        fgets(text + WIDTH * i, WIDTH, *file);
+        int c = getc(file);
+        (Box->text)[i] = c;
+        // printf("%c", (Box->text)[i]);
+
+        if (c == '\n') ((Box->len_strings)++);
     }
+
+    (Box->ind_arr) = (char**) calloc((Box->len_strings) + 1, sizeof(char*));
+
+    (Box->ind_arr)[0] = (Box->text);
+    int last_ind_mas = 0;
+
+    for (int i = 0; i < (Box->len_text); i++)
+    {
+        //printf("%c - %d\n", (Box->text)[i], (Box->text)[i]);
+        if ((Box->text)[i] == '\n')
+        {
+            (Box->ind_arr)[last_ind_mas + 1] = (Box->text) + i + 1;
+            //printf("", )
+            last_ind_mas++;
+            (Box->text)[i] = '\0';  // Расставляю концы строк
+        }
+        // printf("%c - %d  ", (Box->text)[i], (Box->text)[i]);
+    }
+
 }
 
 
-void sort_str(char* text)
+void sort_str(Onegin* Box)
 {
+    char* text = (Box->text);
+
     int count_while = 0;
     int count_do_swap = 1;
 
     while(count_do_swap > 0)
     {
         count_do_swap = 0;
-        for (int j = 0; j < HEIGHT - 1 - count_while; j++)
+        for (int j = 0; j < (Box->len_strings) - 1 - count_while; j++)
         {
-            if (compare_str(text + WIDTH * j, text + WIDTH * (j+1)) > 0)
+            if (compare_str((Box->ind_arr)[j], (Box->ind_arr)[j + 1]) > 0)
             {
-                swap_str(text + WIDTH * j, text + WIDTH * (j+1));
+                swap_str(Box, j, j + 1);
                 count_do_swap++;
             }
         }
@@ -124,22 +197,12 @@ int compare_str(char* str1, char* str2)  // Вернет > 0 при str1 > str2,
 }
 
 
-void swap_str(char* str1, char* str2)
+void swap_str(Onegin* Box, int ind1, int ind2)
 {
-    int ind_elem = 0;
-    char symbol = '0';
-
-    int len_str1 = str_len(str1);
-    int len_str2 = str_len(str2);
-
-    while (ind_elem < (MAX(len_str1, len_str2)))
-    {
-        symbol         = str1[ind_elem];
-        str1[ind_elem] = str2[ind_elem];
-        str2[ind_elem] = symbol;
-
-        ind_elem++;
-    }
+    char* additional_ind = NULL;
+    additional_ind = (Box->ind_arr)[ind2];
+    (Box->ind_arr)[ind2] = (Box->ind_arr)[ind1];
+    (Box->ind_arr)[ind1] = additional_ind;
 }
 
 
