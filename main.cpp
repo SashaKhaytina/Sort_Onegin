@@ -1,16 +1,15 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <malloc.h>
+#include <assert.h>
 
 
 #define MAX(a, b) \
     a > b ? a : b
 
-// Массив "индексов" строк
-// Массив указателей на строки
+// Функция - чищу файл (???) или открывать и закрывать в main
+// Или весь вывод засунуть в одну функцию, и в ней все выводить (тогда приколы с разными сортировками (порядок действий))
 
-int const WIDTH = 100;
-int const HEIGHT = 8;
 
 struct Onegin
 {
@@ -21,16 +20,16 @@ struct Onegin
 };
 
 
-void print_given_text(Onegin* Box);             // НАЧАЛЬНЫЙ!!!!
-void print_sorted_text(Onegin* Box);            // Сортированный
-void sort_str(Onegin* Box);                     // запуск сортировки (пузырек)
-void swap_str(Onegin* Box, int ind1, int ind2); // переставление строк местами
-void read_file(char* file_name, Onegin* Box);   // запись в двумерный массив
-int str_len(char* str1);                        // Длина без '\0'
-int go_to_next_letter(char* str1, int ind_now); // Возвращает индекс близжайшей буквы
+void print_given_text(Onegin* Box, FILE* file);    // НАЧАЛЬНЫЙ!!!!  (в файл)
+void print_sorted_text(Onegin* Box, FILE* file);   // Сортированный  (в тот же файл)
+void sort_str(Onegin* Box);                        // запуск сортировки (пузырек)
+void swap_str(Onegin* Box, int ind1, int ind2);    // переставление строк местами
+void read_file(char* file_name, Onegin* Box);      // запись в двумерный массив
+int str_len(char* str1);                           // Длина без '\0'
+int go_to_next_letter(char* str1, int ind_now);    // Возвращает индекс близжайшей буквы
 
-int compare_str(char* str1, char* str2);        // сравнение строк
-                                                // Вернет > 0 при str1 > str2, < 0 при str1 < str2, = 0 при str1 = str2
+int compare_str(char* str1, char* str2);           // сравнение строк
+                                                   // Вернет > 0 при str1 > str2, < 0 при str1 < str2, = 0 при str1 = str2
 
 int main()
 {
@@ -40,51 +39,75 @@ int main()
 
     read_file("text.txt", &Box);
 
-    printf("\n");
-
-    printf("%d - колво строк\n", Box.len_strings);
-    printf("%d - колво символов\n", Box.len_text);
-
-    printf("\n");
-
-    printf("%s\n", Box.text);
-
-    printf("\n");
-
+//     printf("\n");
+//
+//     printf("%d - колво строк\n", Box.len_strings);
+//     printf("%d - колво символов\n", Box.len_text);
+//
+//     printf("\n");
+//
+//     printf("%s\n", Box.text);
+//
+//     printf("\n");
+//
     printf("%s\n\n", (Box.ind_arr)[7]);
 
-    print_given_text(&Box);
+    FILE* file = fopen("output.txt", "w");
 
-    printf("\n\n\n");
+    print_given_text(&Box, file);
+
     sort_str(&Box);
-    print_sorted_text(&Box);
+
+    print_sorted_text(&Box, file);
+
+    fclose(file);
 }
 
 
-void print_given_text(Onegin* Box)
+void print_given_text(Onegin* Box, FILE* file)
 {
+    assert(Box);
+    assert(file);
+
+    //FILE* file = fopen("output.txt", "w");
+
     char* point = NULL;
     point = Box->text;
+
     for (int i = 0; i < Box->len_text; i++)
     {
         char c = *point;
-        if (c == '\0') printf("\n");
-        else printf("%c", c);
+
+        if (c == '\0') fprintf(file, "\n");
+        else           fprintf(file, "%c", c);
+
         point++;
     }
+
+    fprintf(file, "\n");
+
+    // fclose(file);
 }
 
-void print_sorted_text(Onegin* Box)
+void print_sorted_text(Onegin* Box, FILE* file)
 {
+    assert(Box);
+    assert(file);
+
+    // FILE* file = fopen("output.txt", "w");
+
     for (int i = 0; i < (Box->len_strings); i++)
     {
-        printf("%s\n", (Box->ind_arr)[i]);
+        fprintf(file, "%s\n", (Box->ind_arr)[i]);
     }
+    // fclose(file);
 }
 
 
 int str_len (char* str1)
 {
+    assert(str1);
+
     int ind_elem = 0;
 
     while (str1[ind_elem] != '\0') ind_elem++;
@@ -94,17 +117,21 @@ int str_len (char* str1)
 
 void read_file(char* file_name, Onegin* Box)
 {
+    assert(Box);
+    assert(file_name);
+
     FILE* file = NULL;
     file = fopen(file_name, "r");
     if ((file) == NULL) printf("Не получилось открыть");
 
     // Шаманство с курсором -> <-
+    // Узнаем размер файла
     if (fseek(file, 0, SEEK_END) != 0) printf("Курсор не подвинулся\n");
     (Box->len_text) = ftell(file);
     if (fseek(file, 0, SEEK_SET) != 0) printf("Курсор не вернулся\n");
 
-    (Box->text) = (char*) calloc((Box->len_text) + 1, sizeof(char));
 
+    (Box->text) = (char*) calloc((Box->len_text) + 1, sizeof(char));
 
     for (int i = 0; i < (Box->len_text); i++)
     {
@@ -114,6 +141,7 @@ void read_file(char* file_name, Onegin* Box)
 
         if (c == '\n') ((Box->len_strings)++);
     }
+
 
     (Box->ind_arr) = (char**) calloc((Box->len_strings) + 1, sizeof(char*));
 
@@ -133,11 +161,14 @@ void read_file(char* file_name, Onegin* Box)
         // printf("%c - %d  ", (Box->text)[i], (Box->text)[i]);
     }
 
+    fclose(file);
 }
 
 
 void sort_str(Onegin* Box)
 {
+    assert(Box);
+
     char* text = (Box->text);
 
     int count_while = 0;
@@ -162,6 +193,9 @@ void sort_str(Onegin* Box)
 
 int compare_str(char* str1, char* str2)  // Вернет > 0 при str1 > str2, < 0 при str1 < str2, = 0 при str1 = str2
 {
+    assert(str1);
+    assert(str2);
+
     int ind_elem_1 = 0;
     int ind_elem_2 = 0;
 
@@ -199,8 +233,10 @@ int compare_str(char* str1, char* str2)  // Вернет > 0 при str1 > str2,
 
 void swap_str(Onegin* Box, int ind1, int ind2)
 {
+    assert(Box);
+
     char* additional_ind = NULL;
-    additional_ind = (Box->ind_arr)[ind2];
+    additional_ind       = (Box->ind_arr)[ind2];
     (Box->ind_arr)[ind2] = (Box->ind_arr)[ind1];
     (Box->ind_arr)[ind1] = additional_ind;
 }
@@ -208,6 +244,8 @@ void swap_str(Onegin* Box, int ind1, int ind2)
 
 int go_to_next_letter(char* str1, int ind_now) // Возвращает индекс близжайшей буквы
 {
+    assert(str1);
+
     int el = tolower(str1[ind_now]);
 
     while (((islower(el) == 0) && (el != '\0')))
