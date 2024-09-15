@@ -4,6 +4,8 @@
 #include <assert.h>
 
 
+#define PRINTF_CYAN(string, ...)    printf("\x1b[36m" string "\x1b[0m", ##__VA_ARGS__)
+
 struct Text // TODO: change name
 {
     char** ind_arr;  // массив указателей // TODO: i think text doesn't need these
@@ -24,6 +26,21 @@ int go_to_next_letter(char* str1, int ind_now);    // Возвращает ин�
 int compare_str(char* str1, char* str2);           // сравнение строк
                                                    // Вернет > 0 при str1 > str2, < 0 при str1 < str2, = 0 при str1 = str2
 
+
+
+
+void murderous_sort(void* mass, int len_strings, size_t elem_mass, 
+                    int (*murderous_compare_str)(void* a1, void* a2));
+
+int murderous_compare_str(void* str1, void* str2);
+void murderous_swap_str(void* mass, int ind1, int ind2, size_t size);
+
+
+
+
+
+
+
 int main()
 {
     // чтение файла
@@ -32,24 +49,20 @@ int main()
 
     read_file("text.txt", &Box);
 
-//     printf("\n");
-//
-//     printf("%d - колво строк\n", Box.len_strings);
-//     printf("%d - колво символов\n", Box.len_text);
-//
-//     printf("\n");
-//
-//     printf("%s\n", Box.text);
-//
-//     printf("\n");
-//
     printf("%s\n\n", (Box.ind_arr)[7]);
 
     FILE* file = fopen("output.txt", "w"); // TODO: check these please
+    if (file == NULL) printf("Не удалось открыть файл.");
 
     print_given_text(&Box, file);
 
-    sort_str(&Box);
+    //sort_str(&Box);
+
+    //char** mass = Box.ind_arr;
+    printf("%p - значение! первый с массиве указателей\n", Box.ind_arr[0]);
+    murderous_sort(Box.ind_arr, Box.len_strings, sizeof(char*), murderous_compare_str);
+
+    //Box.ind_arr = mass;
 
     print_sorted_text(&Box, file);
 
@@ -58,6 +71,11 @@ int main()
     free(Box.ind_arr);
     free(Box.text);
 }
+
+
+
+
+
 
 
 void print_given_text(Text* Box, FILE* file) // TODO: fwrite
@@ -85,19 +103,21 @@ void print_given_text(Text* Box, FILE* file) // TODO: fwrite
     fprintf(file, "\n");
 }
 
+
+
+
 void print_sorted_text(Text* Box, FILE* file)
 {
     assert(Box);
     assert(file);
 
-    // FILE* file = fopen("output.txt", "w");
-
     for (int i = 0; i < (Box->len_strings); i++)
     {
         fprintf(file, "%s\n", (Box->ind_arr)[i]);
     }
-    // fclose(file);
 }
+
+
 
 
 int str_len (char* str1) // TODO: wtf (strlen())
@@ -111,13 +131,15 @@ int str_len (char* str1) // TODO: wtf (strlen())
 }
 
 
+
+
 void read_file(char* file_name, Text* Box)
 {
     assert(Box);
     assert(file_name);
 
     FILE* file = fopen(file_name, "r");
-    if ((file) == NULL) printf("Не получилось открыть");
+    if ((file) == NULL) printf("Не удалось открыть файл");
 
     // Шаманство с курсором -> <-
     // Узнаем размер файла
@@ -136,10 +158,6 @@ void read_file(char* file_name, Text* Box)
 
     for (int i = 0; i < (Box->len_text); i++)  // Но тут все равно этот цикл, чтоб считать кол-во строк
     {
-        // int c = getc(file); // TODO: fread
-        // (Box->text)[i] = c;
-        // printf("%c", (Box->text)[i]);
-
         if ((Box->text)[i] == '\n') ((Box->len_strings)++);
     }
 
@@ -151,19 +169,18 @@ void read_file(char* file_name, Text* Box)
 
     for (int i = 0; i < (Box->len_text); i++)
     {
-        //printf("%c - %d\n", (Box->text)[i], (Box->text)[i]);
         if ((Box->text)[i] == '\n')
         {
             (Box->ind_arr)[last_ind_mas + 1] = (Box->text) + i + 1;
-            //printf("", )
             last_ind_mas++;
             (Box->text)[i] = '\0';  // Расставляю концы строк
         }
-        // printf("%c - %d  ", (Box->text)[i], (Box->text)[i]);
     }
 
     fclose(file);
 }
+
+
 
 
 void sort_str(Text* Box)
@@ -192,6 +209,13 @@ void sort_str(Text* Box)
 }
 
 
+
+
+//void murderous_sort(void* mass, int len_strings, size_t elem_mass, func)
+
+
+
+
 int compare_str(char* str1, char* str2)  // Вернет > 0 при str1 > str2, < 0 при str1 < str2, = 0 при str1 = str2
 {
     assert(str1);
@@ -210,7 +234,7 @@ int compare_str(char* str1, char* str2)  // Вернет > 0 при str1 > str2,
         int el2 = tolower(str2[ind_elem_2]);
 
         int comp = el1 - el2;
-        if (comp != 0)          // TODO: delete unnesessary else blocks
+        if (comp != 0)
         {
             return comp;
         }
@@ -229,6 +253,8 @@ int compare_str(char* str1, char* str2)  // Вернет > 0 при str1 > str2,
 }
 
 
+
+
 void swap_str(Text* Box, int ind1, int ind2)
 {
     assert(Box);
@@ -240,19 +266,117 @@ void swap_str(Text* Box, int ind1, int ind2)
 }
 
 
+
+
 int go_to_next_letter(char* str1, int ind_now) // Возвращает индекс близжайшей буквы // TODO: isalpha
 {
     assert(str1);
 
-    // int el = tolower(str1[ind_now]);
-
-    // while (((islower(el) == 0) && (el != '\0'))) // TODO: check if you can delete checking el != '\0'
-    // {
-    //     ind_now++;
-    //     el = tolower(str1[ind_now]);
-    // }
-
     for (;(isalpha(str1[ind_now]) == 0); ind_now++);
 
     return ind_now;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void murderous_sort(void* mass, int len_strings, size_t elem_mass, 
+                    int (*murderous_compare_str)(void* a1, void* a2))
+{
+    PRINTF_CYAN("Я в функции сортировки\n");
+    printf("%p -значение! первый с массиве указателей\n", *(char**)mass);
+    int count_while = 0;
+    int count_do_swap = 1;
+
+    while(count_do_swap > 0)
+    {
+        count_do_swap = 0;
+        for (int j = 0; j < len_strings - 1 - count_while; j++)
+        {
+
+
+
+            // сравнение
+
+            printf("%p - ячейка  mass \n",       (mass));
+            printf("%p - ячейка  j-ого\n",       (mass + j * elem_mass));
+            printf("%p - ячейка  (j + 1)-ого\n", (mass + (j + 1) * elem_mass));
+
+            if (murderous_compare_str((mass + j * elem_mass), (mass + (j + 1) * elem_mass)) > 0) 
+            {
+                printf("ОНО ЗАШЛО (1-ое \"больше\" 2-ого)\n");   // ОНО НЕ РАЗУ НЕ ВЫВЕЛОСЬ
+                //swap_str(Box, j, j + 1);    //
+                murderous_swap_str(mass, j, j + 1, elem_mass);
+                count_do_swap++;
+
+                printf("После swap\n");
+
+                // Эти 2 строчки (вывод) работают только для массивов таких типов!
+                printf("%s, %p - ячейка  j-ого\n",       *(char**)(mass + j * elem_mass), (mass + j * elem_mass));
+                printf("%s, %p - ячейка  (j + 1)-ого\n", *(char**)(mass + (j + 1) * elem_mass), (mass + (j + 1) * elem_mass));
+            }
+
+            printf("Сравнение этой пары закончилось\n\n\n");
+
+
+
+
+
+
+        }
+
+        count_while++;
+    }
+    // Эта строчка (вывод) работает только для массивов таких типов!
+    printf("%s - 1-ая строка отсортированного массива \n", *(char**)mass);
+    PRINTF_CYAN("Я выхожу из функции сортировки\n");
+}
+
+
+
+
+
+int murderous_compare_str(void* str1, void* str2)
+{
+    char* real_str1 = *(char**)str1; // (char**)str1 - указатель на ячейку, в которой лежит указатель на char
+                                     // * в начале - чтоб по первому указателю перейти (попасть в ячейку, в которой лежит указатель на char)
+    char* real_str2 = *(char**)str2;
+
+
+    PRINTF_CYAN("\n\n Я в функции сравнения\n\n");
+
+    printf("%p - ячейка  j-ого\n",       str1);
+    printf("%p - ячейка  (j + 1)-ого\n", str2);
+
+    printf("%s, %p - строка j\n",           real_str1, str1);
+    printf("%s, %p - строка (j + 1)-ого\n", real_str2, str2);
+
+    PRINTF_CYAN("\n Я выхожу из функции сравнения\n\n");
+
+
+
+    return compare_str(real_str1, real_str2);
+}
+
+
+
+void murderous_swap_str(void* mass, int ind1, int ind2, size_t size) // Эмммммм... Работает ли оно для ЛЮБЫХ (по типу) массивов?
+{
+    char* additional_ind = NULL;
+
+    additional_ind                = *(char**)(mass + ind2 * size);
+    *(char**)(mass + ind2 * size) = *(char**)(mass + ind1 * size);
+    *(char**)(mass + ind1 * size) = additional_ind;
 }
