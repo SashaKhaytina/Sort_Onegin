@@ -91,6 +91,7 @@ void print_sorted_text(Text* Box, FILE* file)
     assert(file);
 
     // FILE* file = fopen("output.txt", "w");
+    
 
     for (int i = 0; i < (Box->len_strings); i++)
     {

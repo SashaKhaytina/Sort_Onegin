@@ -6,20 +6,28 @@
 
 #define PRINTF_CYAN(string, ...)    printf("\x1b[36m" string "\x1b[0m", ##__VA_ARGS__)
 
-struct Text // TODO: change name
+
+struct PointerArr
 {
-    char** ind_arr;  // массив указателей // TODO: i think text doesn't need these
-    char* text;
-    int len_text;
+    char** ind_arr;  // массив указателей
     int len_strings;
 };
 
 
-void print_given_text(Text* Box, FILE* file);    // НАЧАЛЬНЫЙ!!!!  (в файл)
-void print_sorted_text(Text* Box, FILE* file);   // Сортированный  (в тот же файл)
-void sort_str(Text* Box);                        // запуск сортировки (пузырек)
-void swap_str(Text* Box, int ind1, int ind2);    // переставление строк местами
-void read_file(char* file_name, Text* Box);      // запись в двумерный массив
+struct Text // TODO: change name
+{
+    //char** ind_arr;  // массив указателей // TODO: i think text doesn't need these
+    char* text;
+    int len_text;
+    //int len_strings;
+};
+
+
+void print_given_text(Text* onegin, FILE* file);    // НАЧАЛЬНЫЙ!!!!  (в файл)
+void print_sorted_text(PointerArr* pointer_arr, FILE* file);   // Сортированный  (в тот же файл)
+//void sort_str(Text* onegin);                        // запуск сортировки (пузырек)
+//void swap_str(Text* onegin, int ind1, int ind2);    // переставление строк местами
+void read_file(char* file_name, Text* onegin, PointerArr* pointer_arr);      // запись в двумерный массив
 int str_len(char* str1);                           // Длина без '\0'
 int go_to_next_letter(char* str1, int ind_now);    // Возвращает индекс близжайшей буквы
 
@@ -45,31 +53,33 @@ int main()
 {
     // чтение файла
 
-    Text Box = {};
+    Text onegin = {};
+    PointerArr pointer_arr = {};
 
-    read_file("text.txt", &Box);
 
-    printf("%s\n\n", (Box.ind_arr)[7]);
+    read_file("text.txt", &onegin, &pointer_arr);
+
+    printf("%s\n\n", (pointer_arr.ind_arr)[7]);
 
     FILE* file = fopen("output.txt", "w"); // TODO: check these please
     if (file == NULL) printf("Не удалось открыть файл.");
 
-    print_given_text(&Box, file);
+    print_given_text(&onegin, file);
 
-    //sort_str(&Box);
+    //sort_str(&onegin);
 
-    //char** mass = Box.ind_arr;
-    printf("%p - значение! первый с массиве указателей\n", Box.ind_arr[0]);
-    murderous_sort(Box.ind_arr, Box.len_strings, sizeof(char*), murderous_compare_str);
+    //char** mass = onegin.ind_arr;
+    printf("%p - значение! первый с массиве указателей\n", pointer_arr.ind_arr[0]);
+    murderous_sort(pointer_arr.ind_arr, pointer_arr.len_strings, sizeof(char*), murderous_compare_str);
 
-    //Box.ind_arr = mass;
+    //onegin.ind_arr = mass;
 
-    print_sorted_text(&Box, file);
+    print_sorted_text(&pointer_arr, file);
 
     fclose(file);
 
-    free(Box.ind_arr);
-    free(Box.text);
+    free(pointer_arr.ind_arr);
+    free(onegin.text);
 }
 
 
@@ -78,26 +88,26 @@ int main()
 
 
 
-void print_given_text(Text* Box, FILE* file) // TODO: fwrite
+void print_given_text(Text* onegin, FILE* file) // TODO: fwrite
 {
-    assert(Box);
+    assert(onegin);
     assert(file);
 
     char* point = NULL;
-    point = Box->text;
+    point = onegin->text;
 
-    // for (int i = 0; i < Box->len_text; i++)
-    // {
-    //     char c = *point;
+    for (int i = 0; i < onegin->len_text; i++)
+    {
+        char c = *point;
 
-    //     if (c == '\0') fprintf(file, "\n");
-    //     else           fprintf(file, "%c", c);
+        if (c == '\0') fprintf(file, "\n");
+        else           fprintf(file, "%c", c);
 
-    //     point++;
-    // }
+        point++;
+    }
 
-    int write_count_symbol = fwrite((Box->text), sizeof(char), (Box->len_text), file);
-    if (write_count_symbol != (Box->len_text)) fprintf(stderr, "Считал не то количество\n"); 
+    // int write_count_symbol = fwrite((onegin->text), sizeof(char), (onegin->len_text), file);
+    // if (write_count_symbol != (onegin->len_text)) fprintf(stderr, "Считал не то количество\n"); 
 
 
     fprintf(file, "\n");
@@ -106,14 +116,14 @@ void print_given_text(Text* Box, FILE* file) // TODO: fwrite
 
 
 
-void print_sorted_text(Text* Box, FILE* file)
+void print_sorted_text(PointerArr* pointer_arr, FILE* file)
 {
-    assert(Box);
+    assert(pointer_arr);
     assert(file);
 
-    for (int i = 0; i < (Box->len_strings); i++)
+    for (int i = 0; i < (pointer_arr->len_strings); i++)
     {
-        fprintf(file, "%s\n", (Box->ind_arr)[i]);
+        fprintf(file, "%s\n", (pointer_arr->ind_arr)[i]);
     }
 }
 
@@ -133,9 +143,9 @@ int str_len (char* str1) // TODO: wtf (strlen())
 
 
 
-void read_file(char* file_name, Text* Box)
+void read_file(char* file_name, Text* onegin, PointerArr* pointer_arr)
 {
-    assert(Box);
+    assert(onegin);
     assert(file_name);
 
     FILE* file = fopen(file_name, "r");
@@ -144,36 +154,36 @@ void read_file(char* file_name, Text* Box)
     // Шаманство с курсором -> <-
     // Узнаем размер файла
     if (fseek(file, 0, SEEK_END) != 0) printf("Курсор не подвинулся\n");
-    (Box->len_text) = ftell(file);
+    (onegin->len_text) = ftell(file);
     if (fseek(file, 0, SEEK_SET) != 0) printf("Курсор не вернулся\n");
 
 
-    (Box->text) = (char*) calloc((Box->len_text) + 1, sizeof(char));
+    (onegin->text) = (char*) calloc((onegin->len_text) + 1, sizeof(char));
 
 
     // Считывание файла (fread)
-    int count_symbol = fread((Box->text), sizeof(char), (Box->len_text), file);
-    if (count_symbol != (Box->len_text)) fprintf(stderr, "Считал не то количество\n"); 
+    int count_symbol = fread((onegin->text), sizeof(char), (onegin->len_text), file);
+    if (count_symbol != (onegin->len_text)) fprintf(stderr, "Считал не то количество\n"); 
 
 
-    for (int i = 0; i < (Box->len_text); i++)  // Но тут все равно этот цикл, чтоб считать кол-во строк
+    for (int i = 0; i < (onegin->len_text); i++)  // Но тут все равно этот цикл, чтоб считать кол-во строк
     {
-        if ((Box->text)[i] == '\n') ((Box->len_strings)++);
+        if ((onegin->text)[i] == '\n') ((pointer_arr->len_strings)++);
     }
 
 
-    (Box->ind_arr) = (char**) calloc((Box->len_strings) + 1, sizeof(char*));
+    (pointer_arr->ind_arr) = (char**) calloc((pointer_arr->len_strings) + 1, sizeof(char*));
 
-    (Box->ind_arr)[0] = (Box->text);
+    (pointer_arr->ind_arr)[0] = (onegin->text);
     int last_ind_mas = 0;
 
-    for (int i = 0; i < (Box->len_text); i++)
+    for (int i = 0; i < (onegin->len_text); i++)
     {
-        if ((Box->text)[i] == '\n')
+        if ((onegin->text)[i] == '\n')
         {
-            (Box->ind_arr)[last_ind_mas + 1] = (Box->text) + i + 1;
+            (pointer_arr->ind_arr)[last_ind_mas + 1] = (onegin->text) + i + 1;
             last_ind_mas++;
-            (Box->text)[i] = '\0';  // Расставляю концы строк
+            (onegin->text)[i] = '\0';  // Расставляю концы строк
         }
     }
 
@@ -183,30 +193,30 @@ void read_file(char* file_name, Text* Box)
 
 
 
-void sort_str(Text* Box)
-{
-    assert(Box);
+// void sort_str(PointerArr* point_arr)  // Можно в 
+// {
+//     assert(point_arr);
 
-    char* text = (Box->text);
+//     //char* text = (onegin->text);
 
-    int count_while = 0;
-    int count_do_swap = 1;
+//     int count_while = 0;
+//     int count_do_swap = 1;
 
-    while(count_do_swap > 0)
-    {
-        count_do_swap = 0;
-        for (int j = 0; j < (Box->len_strings) - 1 - count_while; j++)
-        {
-            if (compare_str((Box->ind_arr)[j], (Box->ind_arr)[j + 1]) > 0) 
-            {
-                swap_str(Box, j, j + 1);
-                count_do_swap++;
-            }
-        }
+//     while(count_do_swap > 0)
+//     {
+//         count_do_swap = 0;
+//         for (int j = 0; j < (point_arr->len_strings) - 1 - count_while; j++)
+//         {
+//             if (compare_str((point_arr->ind_arr)[j], (point_arr->ind_arr)[j + 1]) > 0) 
+//             {
+//                 swap_str(point_arr, j, j + 1);
+//                 count_do_swap++;
+//             }
+//         }
 
-        count_while++;
-    }
-}
+//         count_while++;
+//     }
+// }
 
 
 
@@ -255,15 +265,15 @@ int compare_str(char* str1, char* str2)  // Вернет > 0 при str1 > str2,
 
 
 
-void swap_str(Text* Box, int ind1, int ind2)
-{
-    assert(Box);
+// void swap_str(PointerArr* point_arr, int ind1, int ind2)
+// {
+//     assert(point_arr);
 
-    char* additional_ind = NULL;
-    additional_ind       = (Box->ind_arr)[ind2];
-    (Box->ind_arr)[ind2] = (Box->ind_arr)[ind1];
-    (Box->ind_arr)[ind1] = additional_ind;
-}
+//     char* additional_ind = NULL;
+//     additional_ind       = (point_arr->ind_arr)[ind2];
+//     (point_arr->ind_arr)[ind2] = (point_arr->ind_arr)[ind1];
+//     (point_arr->ind_arr)[ind1] = additional_ind;
+// }
 
 
 
@@ -272,7 +282,7 @@ int go_to_next_letter(char* str1, int ind_now) // Возвращает инде�
 {
     assert(str1);
 
-    for (;(isalpha(str1[ind_now]) == 0); ind_now++);
+    for (;isalpha(str1[ind_now]) == 0; ind_now++){}
 
     return ind_now;
 }
@@ -317,7 +327,7 @@ void murderous_sort(void* mass, int len_strings, size_t elem_mass,
             if (murderous_compare_str((mass + j * elem_mass), (mass + (j + 1) * elem_mass)) > 0) 
             {
                 printf("ОНО ЗАШЛО (1-ое \"больше\" 2-ого)\n");   // ОНО НЕ РАЗУ НЕ ВЫВЕЛОСЬ
-                //swap_str(Box, j, j + 1);    //
+                //swap_str(onegin, j, j + 1);    //
                 murderous_swap_str(mass, j, j + 1, elem_mass);
                 count_do_swap++;
 
