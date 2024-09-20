@@ -35,7 +35,7 @@ int main()
     // printf("%c, %c\n", mas2[2], mas2[0]);         // 
 
     // murderous_swap_str(mas2, 2, 0, sizeof(char));
-    // printf("%c, %c\n", mas2[2], mas2[0]);         // выводит ,  -  че блин 0_o :(  ༼;´༎ຶ ۝ ༎ຶ༽
+    // printf("%c, %c\n", mas2[2], mas2[0]);         // выводит ,  -  че блин 0_o :(  
 
     
     
@@ -43,7 +43,7 @@ int main()
     int mas3[5] = {'a', 'b', 'c', 'd', 'e'};
     printf("%c, %c\n", mas3[2], mas3[0]);
 
-    murderous_swap_str(mas3, 2, 0, sizeof(char)); // ༼;´༎ຶ ۝ ༎ຶ༽   (⁠╥⁠﹏⁠╥⁠)  (ಥ﹏ಥ)  ༼ಢ_ಢ༽
+    murderous_swap_str(mas3, 2, 0, sizeof(char)); //
     printf("%c, %c\n", mas3[2], mas3[0]);
 
     return 0;
