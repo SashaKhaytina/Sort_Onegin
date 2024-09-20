@@ -18,39 +18,23 @@ static void murderous_swap_str(void* mass, int ind1, int ind2, size_t size) // �
     char* point1 = (char*) mass + ind1 * size;
     char* point2 = (char*) mass + ind2 * size;
 
-    //printf("%d - SIZEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE\n", size);
-
     for (int i = 0; i < size; i++)
     {
-        // printf("%d\n", i);
-        // printf("%p - point1 start\n", point1);
-        // printf("%p - point2 start\n", point2);
-        
         char something = *point1;
         *point1 = *point2;
         *point2 = something;
 
         point1++;
         point2++;
-
-        // printf("%p - point1 finish\n", point1);
-        // printf("%p - point2 finich\n", point2);
     }
-
-
-
-    // char *something               = *(char**)(mass + ind2 * size); // TOD: rename
-    // *(char**)(mass + ind2 * size) = *(char**)(mass + ind1 * size);
-    // *(char**)(mass + ind1 * size) = something;
 }
-
 
 
 void murderous_sort(void* mass, int len_strings, size_t elem_mass, 
                     int (*murderous_compare_str)(void* a1, void* a2))
 {
     assert(mass);
-    assert(murderous_compare_str); // assert на функцию???
+    assert(murderous_compare_str); 
 
 
     // ---- вывод -----
@@ -113,9 +97,6 @@ void murderous_sort(void* mass, int len_strings, size_t elem_mass,
     PRINTF_CYAN("Я выхожу из функции сортировки\n");
     // ---- конец -----
 }
-
-
-
 
 
 int murderous_compare_str_first_elem(void* str1, void* str2)
@@ -223,6 +204,6 @@ int murderous_compare_str_end_elem(void* str1, void* str2)
         ind_elem_2--;
     }
 
-    return (real_str1[ind_elem_1] - real_str2[ind_elem_2]);  // Тут кто-то '\0', поэтому без tolower()
+    return (real_str1[ind_elem_1] - real_str2[ind_elem_2]);
 }
 

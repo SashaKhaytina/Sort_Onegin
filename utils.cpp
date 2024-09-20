@@ -29,9 +29,9 @@ int size_file(FILE* file)
 {
     int size = 0;
 
-    if (fseek(file, 0, SEEK_END) != 0) printf("Курсор не подвинулся\n"); // TODO: delete this checking
+    fseek(file, 0, SEEK_END);
     size = ftell(file);
-    if (fseek(file, 0, SEEK_SET) != 0) printf("Курсор не вернулся\n");
+    fseek(file, 0, SEEK_SET);
 
     return size;
 }
@@ -52,20 +52,4 @@ int file_strings_counter(FILE* file)
     }
 
     return counter_str;
-    // for (int i = 0; i < *len_text; i++)
-    // {
-    //     if ((*text)[i] == '\n') 
-    //         (*len_strings)++;
-    // }
 }
-
-
-// int str_len (char* str1) // TODO: wtf (strlen())
-// {
-//     assert(str1);
-
-//     int ind_elem = 0;
-
-//     while (str1[ind_elem] != '\0') ind_elem++;
-//     return ind_elem;
-// }
