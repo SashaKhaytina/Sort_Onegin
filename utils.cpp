@@ -9,7 +9,7 @@ int go_to_next_letter(char* str1, int ind_now) // Возвращает инде�
 {
     assert(str1);
 
-    for (;isalpha(str1[ind_now]) == 0; ind_now++){}
+    for (; !isalpha(str1[ind_now]); ind_now++) {}
 
     return ind_now;
 }
@@ -30,7 +30,7 @@ int size_file(FILE* file)
     int size = 0;
 
     fseek(file, 0, SEEK_END);
-    size = ftell(file);
+    size = (int) ftell(file);
     fseek(file, 0, SEEK_SET);
 
     return size;

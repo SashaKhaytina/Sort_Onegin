@@ -3,6 +3,12 @@
 
 #define PRINTF_CYAN(string, ...)    printf("\x1b[36m" string "\x1b[0m", ##__VA_ARGS__)
 
+struct StringPoint
+{
+    char* begin_str;
+    char* end_str;
+};
+
 
 int  str_len               (char* str1);               // Длина без '\0'
 int  go_to_next_letter     (char* str1, int ind_now);  // Возвращает индекс близжайшей буквы
