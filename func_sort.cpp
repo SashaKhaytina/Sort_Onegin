@@ -9,8 +9,6 @@
 #include "main.h"
 
 
-
-
 static void murderous_swap_str(void* mass, int ind1, int ind2, size_t size);
 
 

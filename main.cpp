@@ -9,6 +9,9 @@
 #include "io.h"
 
 
+void text_free(Text* onegin);
+
+
 int main()
 {
     ProgramStatus status = OK;
@@ -45,8 +48,14 @@ int main()
 
     fclose(file);
 
-    free(onegin.strings_arr_p);
-    free(onegin.text);
+    text_free(&onegin);
 
     print_errors_code(status);
+}
+
+
+void text_free(Text* onegin)
+{
+    free(onegin->strings_arr_p);
+    free(onegin->text);
 }

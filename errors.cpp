@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "errors.h"
 
+
 void print_errors_code(ProgramStatus status)
 {
     switch (status)
