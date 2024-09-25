@@ -3,26 +3,10 @@
 #include <malloc.h>
 #include <assert.h>
 
+#include "main.h"
 #include "func_sort.h"
 #include "utils.h"
 #include "errors.h"
-
-
-// struct StringPoint
-// {
-//     char* begin_str;
-//     char* end_str;
-// };
-
-
-struct Text
-{
-    char* text;
-    size_t len_text;
-
-    StringPoint* strings_arr_p;  // массив указателей
-    int len_strings;
-};
 
 
 void          print_given_text (Text* onegin, FILE* file);            // НАЧАЛЬНЫЙ!!!!  (в файл)
