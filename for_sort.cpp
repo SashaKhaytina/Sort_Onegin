@@ -20,16 +20,16 @@ struct Text
     char* text;
     int len_text;
 
-    StringPoint* ind_arr;  // массив указателей // TODO: rename to strings_arr
+    StringPoint* strings_arr_p;  // массив указателей // TOD: rename to strings_arr
     int len_strings;
 };
 
 
-void print_given_text  (Text* onegin, FILE* file);      // НАЧАЛЬНЫЙ!!!!  (в файл)
-void print_sorted_text (Text* onegin, FILE* file);      // Сортированный  (в тот же файл)
+void          print_given_text (Text* onegin, FILE* file);            // НАЧАЛЬНЫЙ!!!!  (в файл)
+void          print_sorted_text(Text* onegin, FILE* file);            // Сортированный  (в тот же файл)
 
-ProgramStatus read_file         (const char* file_name, Text* onegin); // запись в двумерный массив
-ProgramStatus filling_points_arr(Text* onegin);                  // Заполнение массива указателей
+ProgramStatus get_text         (const char* file_name, Text* onegin); // запись в двумерный массив
+ProgramStatus fill_strings_arr (Text* onegin);                        // Заполнение массива указателей
 
 
 
@@ -39,7 +39,7 @@ int main()
 
     Text onegin = {};
 
-    status = read_file("text.txt", &onegin);
+    status = get_text("text.txt", &onegin);
     if (status != OK)
     {
         print_errors_code(status);
@@ -48,7 +48,7 @@ int main()
 
 
     // ---- вывод -----
-    //printf("%s\n\n", (onegin.ind_arr)[7]); 
+    //printf("%s\n\n", (onegin.strings_arr_p)[7]); 
     // ---- конец -----
 
 
@@ -62,25 +62,27 @@ int main()
 
 
     // ---- вывод -----
-    print_given_text(&onegin, file); // TODO: print given text after printing sorted text
-    //printf("%p - значение! первый с массиве указателей\n", onegin.ind_arr[0]);
+    // Тут был вывод начального
+    //printf("%p - значение! первый с массиве указателей\n", onegin.strings_arr_p[0]);
     // ---- конец -----
 
 
     for (size_t i = 0; i < sizeof(onegin.len_strings); ++i) {
-        printf("%s\n", onegin.ind_arr[i].begin_str);
+        printf("%s\n", onegin.strings_arr_p[i].begin_str);
     }
     // Сортировка с начала строки
-    murderous_sort(onegin.ind_arr, onegin.len_strings, sizeof(StringPoint), murderous_compare_str_first_elem);
+    murderous_sort(onegin.strings_arr_p, onegin.len_strings, sizeof(StringPoint), murderous_compare_str_first_elem);
     print_sorted_text(&onegin, file);
 
     // Сортировка с конца строки
-    murderous_sort(onegin.ind_arr, onegin.len_strings, sizeof(StringPoint), murderous_compare_str_end_elem);
+    murderous_sort(onegin.strings_arr_p, onegin.len_strings, sizeof(StringPoint), murderous_compare_str_end_elem);
     print_sorted_text(&onegin, file);
+
+    print_given_text(&onegin, file); // TOD: print given text after printing sorted text
 
     fclose(file);
 
-    free(onegin.ind_arr);
+    free(onegin.strings_arr_p);
     free(onegin.text);
 
     print_errors_code(status);
@@ -95,15 +97,8 @@ void print_given_text(Text* onegin, FILE* file)
 
     char* point = onegin->text;
 
-    for (int i = 0; i < onegin->len_text; i++) // TODO: fprintf("%s")
-    {
-        char c = *point;
-
-        if (c == '\0') fprintf(file, "\n");
-        else           fprintf(file, "%c", c);
-
-        point++;
-    }
+    for (int i = 0; i < (onegin->len_strings); i++)
+        point += fprintf(file, "%s\n", point);
 
     fprintf(file, "\n");
 }
@@ -116,13 +111,13 @@ void print_sorted_text(Text* onegin, FILE* file)
 
 
     for (int i = 0; i < (onegin->len_strings); i++)
-        fprintf(file, "%s\n", ((onegin->ind_arr) + i)->begin_str);
+        fprintf(file, "%s\n", ((onegin->strings_arr_p) + i)->begin_str);
     
     fprintf(file, "\n\n");
 }
 
 
-ProgramStatus read_file(const char* file_name, Text* onegin) // TODO: rename to get_text
+ProgramStatus get_text(const char* file_name, Text* onegin) // TOD: rename to get_text
 {
     assert(file_name);
     assert(onegin);
@@ -138,16 +133,17 @@ ProgramStatus read_file(const char* file_name, Text* onegin) // TODO: rename to 
 
 
     // Считывание файла (fread)
-    int count_symbol = (int)fread(onegin->text, sizeof(char), (size_t)(onegin->len_text), file); // TODO: conversion to int is weird imho
+    int count_symbol = (int) fread(onegin->text, sizeof(char), (size_t)(onegin->len_text), file); // TODO: conversion to int is weird imho
     if (count_symbol != onegin->len_text) 
         return ERROR_READING;
 
-    onegin->len_strings = file_strings_counter(file); // TODO: read from buffer, not from file
+    //onegin->len_strings = file_strings_counter(file); // TOD: read from buffer, not from file
+    onegin->len_strings = strings_counter(onegin->text);
 
     printf("%d\n", onegin->len_strings);
 
     // Заполнение массива указателей
-    filling_points_arr(onegin);
+    fill_strings_arr(onegin);
 
     fclose(file);
 
@@ -155,28 +151,27 @@ ProgramStatus read_file(const char* file_name, Text* onegin) // TODO: rename to 
 }
 
 
-ProgramStatus filling_points_arr(Text* onegin) // TODO: rename
+ProgramStatus fill_strings_arr(Text* onegin) // TOD: rename
 {
     assert(onegin);
 
     
-    onegin->ind_arr = (StringPoint*) calloc((size_t)(onegin->len_strings + 1), sizeof(StringPoint)); // TODO звезды....
-    if (onegin->ind_arr == NULL) 
+    onegin->strings_arr_p = (StringPoint*) calloc((size_t)(onegin->len_strings + 1), sizeof(StringPoint));
+    if (onegin->strings_arr_p == NULL) 
         return ERROR_MEMORY;
 
-    onegin->ind_arr->begin_str = onegin->text;  
-    int last_ind_mas = 0; // TODO: rename
+    onegin->strings_arr_p->begin_str = onegin->text;  
+    int ind_fill_now = 0; // TOD: rename
 
     for (int i = 0; i < onegin->len_text; i++)
     {
         if ((onegin->text)[i] == '\n')
         {
-            onegin->ind_arr[last_ind_mas].end_str = onegin->text + i;
-            last_ind_mas++;
-            onegin->ind_arr[last_ind_mas].begin_str = onegin->text + i + 1;
-            //last_ind_mas++;
-            // printf("%p - НАЧАЛО СТРОКИ!!!!!!!!!!!!\n%s - СТРОКА\n\n\n", onegin->text + i + 1, onegin->text + i + 1);
-            (onegin->text)[i] = '\0';  // Расставляю концы строк
+            onegin->strings_arr_p[ind_fill_now].end_str = onegin->text + i;
+            ind_fill_now++;
+            onegin->strings_arr_p[ind_fill_now].begin_str = onegin->text + i + 1;
+
+            (onegin->text)[i] = '\0';  // Расставляем концы строк
         }
     }
 

@@ -53,3 +53,24 @@ int file_strings_counter(FILE* file)
 
     return counter_str;
 }
+
+
+int strings_counter(const char* text)
+{
+    assert(text);
+
+    int counter_str = 0;
+    int ind = 0;
+
+    while (text[ind] != '\0')
+    {
+        assert(text[ind]);
+        
+        if (text[ind] == '\n')
+            counter_str++;
+        ind++;
+    }
+
+    return counter_str;
+}
+

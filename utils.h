@@ -10,11 +10,12 @@ struct StringPoint
 };
 
 
-int  str_len               (char* str1);               // Длина без '\0'
-int  go_to_next_letter     (char* str1, int ind_now);  // Возвращает индекс близжайшей буквы
-int  go_back_to_next_letter(char* str1, int ind_now);
-int  size_file             (FILE* file);
-int  file_strings_counter  (FILE* file);
+int str_len               (char* str1);               // Длина без '\0'
+int go_to_next_letter     (char* str1, int ind_now);  // Возвращает индекс близжайшей буквы
+int go_back_to_next_letter(char* str1, int ind_now);
+int size_file             (FILE* file);
+int file_strings_counter  (FILE* file);
+int strings_counter       (const char* text);
 
 
 #endif
