@@ -5,7 +5,7 @@
 #include "utils.h"
 
 
-int go_to_next_letter(char* str1, int ind_now) // Возвращает индекс близжайшей буквы
+int go_to_next_letter(char* str1, int ind_now)
 {
     assert(str1);
 
@@ -15,7 +15,7 @@ int go_to_next_letter(char* str1, int ind_now) // Возвращает инде�
 }
 
 
-int go_back_to_next_letter(char* str1, int ind_now) // Возвращает индекс близжайшей буквы
+int go_back_to_next_letter(char* str1, int ind_now)
 {
     assert(str1);
 
@@ -25,12 +25,12 @@ int go_back_to_next_letter(char* str1, int ind_now) // Возвращает ин
 }
 
 
-int size_file(FILE* file)
+size_t size_file(FILE* file)
 {
-    int size = 0;
+    size_t size = 0;
 
     fseek(file, 0, SEEK_END);
-    size = (int) ftell(file);
+    size = (size_t) ftell(file);
     fseek(file, 0, SEEK_SET);
 
     return size;
@@ -41,9 +41,9 @@ int file_strings_counter(FILE* file)
 {
     int counter_str = 0;
 
-    int size_f = size_file(file);
+    size_t size_f = size_file(file);
 
-    for (int i = 0; i < size_f; i++)
+    for (size_t i = 0; i < size_f; i++)
     {
         if (getc(file) == '\n')
         {
@@ -65,7 +65,7 @@ int strings_counter(const char* text)
     while (text[ind] != '\0')
     {
         assert(text[ind]);
-        
+
         if (text[ind] == '\n')
             counter_str++;
         ind++;
