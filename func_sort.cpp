@@ -2,17 +2,15 @@
 #include <ctype.h>
 #include <malloc.h>
 #include <assert.h>
-#include <string.h>
 
 #include "func_sort.h"
 #include "utils.h"
-#include "main.h"
-
+#include "working_with_text.h"
 
 static void murderous_swap_str(void* mass, int ind1, int ind2, size_t size);
 
 
-static void murderous_swap_str(void* mass, int ind1, int ind2, size_t size) // Тут меняется массив указателей!
+static void murderous_swap_str(void* mass, int ind1, int ind2, size_t size)
 {
     assert(mass);
 
@@ -32,7 +30,7 @@ static void murderous_swap_str(void* mass, int ind1, int ind2, size_t size) // �
 
 
 void murderous_sort(void* mass, int len_strings, size_t elem_mass, 
-                    int (*murderous_compare_str)(void* a1, void* a2))
+                    int (*murderous_compare_str)(void* a1, void* a2))  // Умный пузырёк
 {
     assert(mass);
     assert(murderous_compare_str); 
@@ -63,15 +61,14 @@ int murderous_compare_str_first_elem(void* str1, void* str2)
     assert(str1);
     assert(str2);
 
-    char* real_str1 = ((StringPoint*)str1)->begin_str; // (char**)str1 - указатель на ячейку, в которой лежит указатель на char
-                                                       // * в начале - чтоб по первому указателю перейти (попасть в ячейку, в которой лежит указатель на char)
-    char* real_str2 = ((StringPoint*)str2)->begin_str;
 
+    char* real_str1 = ((StringPoint*)str1)->begin_str; 
+    char* real_str2 = ((StringPoint*)str2)->begin_str;
 
     int ind_elem_1 = 0;
     int ind_elem_2 = 0;
 
-    while ((real_str1[ind_elem_1] != '\0') && (real_str2[ind_elem_2] != '\0')) // TODO: for can do your code smaller and clearer than while
+    while ((real_str1[ind_elem_1] != '\0') && (real_str2[ind_elem_2] != '\0')) 
     {
         // Смещение счетчика до буквы в str1 и str2
         ind_elem_1 = go_to_next_letter(real_str1, ind_elem_1);
@@ -91,7 +88,7 @@ int murderous_compare_str_first_elem(void* str1, void* str2)
             return 0;
         }
 
-        // Значит простое совпадение букв
+        // Cовпадение букв
         ind_elem_1++;
         ind_elem_2++;
     }
@@ -116,7 +113,7 @@ int murderous_compare_str_end_elem(void* str1, void* str2)
     int ind_elem_2 = (int) (real_end_str2 - real_str2) - 1;
 
 
-    while ((ind_elem_1 != 0) && (ind_elem_2 != 0)) // TODO: for can do your code smaller and clearer than while
+    while ((ind_elem_1 != 0) && (ind_elem_2 != 0))
     {
         // Смещение счетчика до буквы в str1 и str2
         ind_elem_1 = go_back_to_next_letter(real_str1, ind_elem_1);
@@ -131,12 +128,7 @@ int murderous_compare_str_end_elem(void* str1, void* str2)
             return comp;
         }
 
-        // if (el1 == '\0') // Значит и el2 = '/0' 
-        // {
-        //     return 0;
-        // }
-
-        // Значит простое совпадение букв
+        // Совпадение букв
         ind_elem_1--;
         ind_elem_2--;
     }

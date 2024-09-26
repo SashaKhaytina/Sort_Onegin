@@ -1,15 +1,11 @@
 #ifndef IO_H
 #define IO_H
 
-#include "main.h"
-#include "errors.h"
+#include "working_with_text.h"
 
 
-void          print_given_text (Text* onegin, FILE* file);            // НАЧАЛЬНЫЙ!!!!  (в файл)
-void          print_sorted_text(Text* onegin, FILE* file);            // Сортированный  (в тот же файл)
-
-ProgramStatus get_text         (const char* file_name, Text* onegin); // запись в двумерный массив
-ProgramStatus fill_strings_arr (Text* onegin);                        // Заполнение массива указателей
+void print_text_by_buffer (Text* onegin, FILE* file); // Начальный текст     (в файл)
+void print_text_by_strings(Text* onegin, FILE* file); // Сортированный текст (в файл)
 
 
 #endif

@@ -60,15 +60,11 @@ int strings_counter(const char* text)
     assert(text);
 
     int counter_str = 0;
-    int ind = 0;
 
-    while (text[ind] != '\0')
+    for (int ind = 0; text[ind] != '\0'; ind++) 
     {
-        assert(text[ind]);
-
         if (text[ind] == '\n')
             counter_str++;
-        ind++;
     }
 
     return counter_str;
